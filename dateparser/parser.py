@@ -309,9 +309,9 @@ class _parser(object):
     def _get_datetime_obj_params(self):
         if not self.now:
             self._set_relative_base()
-
+        #UWAGA TUTAJ TE PARAMETRY
         params = {
-            'day': self.day or self.now.day,
+            'day': self.day or 20,
             'month': self.month or self.now.month,
             'year': self.year or self.now.year,
             'hour': 0, 'minute': 0, 'second': 0, 'microsecond': 0,
@@ -437,12 +437,13 @@ class _parser(object):
         tokens = tokenizer(datestring)
         po = cls(tokens.tokenize(), settings)
         dateobj = po._results()
-
+        # UWAGA CZYLI TUTAJ DOBRZE
         # correction for past, future if applicable
         dateobj = po._correct_for_time_frame(dateobj)
 
         # correction for preference of day: beginning, current, end
-        dateobj = po._correct_for_day(dateobj)
+        #UWAGA CZYLI TUTAJ ZMIENIA NA NOW ;3
+        # dateobj = po._correct_for_day(dateobj)
 
         return dateobj, po._get_period()
 
