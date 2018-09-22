@@ -30,6 +30,7 @@ def search_dates(text, languages=None, settings=None):
         [('on 4 October 1957', datetime.datetime(1957, 10, 4, 0, 0))]
 
         """
+    # TUTAJ ZWRACA WYNIKI
     result = _search_with_detection.search_dates(text=text, languages=languages, settings=settings)
     if result['Dates']:
         return result['Dates']

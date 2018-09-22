@@ -3,6 +3,8 @@ import regex as re
 
 from datetime import datetime
 
+
+
 TIME_MATCHER = re.compile(
     r'.*?'
     r'(?P<hour>2[0-3]|[0-1]\d|\d):'
@@ -56,8 +58,9 @@ __strptime = patch_strptime()
 
 
 def strptime(date_string, format):
-    obj = datetime(*__strptime(date_string, format)[:-3])
-
+    # obj = datetime(*__strptime(date_string, format)[:-3])
+    from dateparser.parser import MyDateTime
+    obj = MyDateTime(*__strptime(date_string, format)[:-3])
     if '%f' in format:
         try:
             match_groups = TIME_MATCHER.match(date_string).groupdict()

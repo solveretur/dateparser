@@ -9,7 +9,6 @@ from datetime import timedelta
 
 from dateparser.utils.strptime import strptime
 
-
 NSP_COMPATIBLE = re.compile(r'\D+')
 MERIDIAN = re.compile(r'am|pm')
 MICROSECOND = re.compile(r'\d{1,6}')
@@ -57,9 +56,12 @@ def resolve_date_order(order, lst=None):
     return chart_list[order] if lst else chart[order]
 
 
+# TA METODA ZWRACA DATETIME
 def parse(datestring, settings):
+    # TODO TUTAj ZMIENIC ŻEBY ZWRACAŁ STRINGA     return ("2018-07-15","day")
     exceptions = []
-    for parser in [_parser.parse, _no_spaces_parser.parse]:
+    for parser in [_parser.parse]:
+        # for parser in [_parser.parse, _no_spaces_parser.parse]:
         try:
             res = parser(datestring, settings)
             if res:
@@ -91,6 +93,7 @@ class _time_parser(object):
         else:
             raise ValueError('%s does not seem to be a valid time string' % _timestring)
 
+
 time_parser = _time_parser()
 
 
@@ -116,7 +119,7 @@ class _no_spaces_parser(object):
     def __init__(self, *args, **kwargs):
 
         self._all = (self._dateformats +
-                     [x+y for x in self._dateformats for y in self._timeformats] +
+                     [x + y for x in self._dateformats for y in self._timeformats] +
                      self._timeformats)
 
         self.date_formats = {
@@ -171,7 +174,6 @@ class _no_spaces_parser(object):
 
 
 class _parser(object):
-
     alpha_directives = OrderedDict([
         ('weekday', ['%A', '%a']),
         ('month', ['%B', '%b']),
@@ -182,7 +184,6 @@ class _parser(object):
         'day': ['%d'],
         'year': ['%y', '%Y'],
     }
-
 
     def __init__(self, tokens, settings):
         self.settings = settings
@@ -222,7 +223,7 @@ class _parser(object):
 
             if self.time is None:
                 try:
-                    microsecond = MICROSECOND.search(self.filtered_tokens[index+1][0]).group()
+                    microsecond = MICROSECOND.search(self.filtered_tokens[index + 1][0]).group()
                     _is_after_time_token = token.index(":")
                     _is_after_period = self.tokens[
                         self.tokens.index((token, 0)) + 1][0].index('.')
@@ -252,7 +253,7 @@ class _parser(object):
                         skip_index.append(mindex)
                     else:
                         self._token_time = token
-                    self.time = lambda: time_parser(self._token_time)
+                    # self.time = lambda: time_parser(self._token_time)
                     continue
 
             results = self._parse(type, token, settings.FUZZY, skip_component=skip_component)
@@ -265,6 +266,7 @@ class _parser(object):
         params = {}
         for attr in known:
             params.update({attr: getattr(self, attr)})
+        #     TODO TUTAJ MOŻE COS Z TYM UNDEFINED DLA UNKNOWN TOKENÓW
         for attr in unknown:
             for token, type, _ in self.unset_tokens:
                 if type == 0:
@@ -286,14 +288,15 @@ class _parser(object):
             return 'day'
 
     def _get_datetime_obj(self, **params):
+        # TODO TUTAJ ZMIENIĆ
         try:
-            return datetime(**params)
+            return MyDateTime(**params)
         except ValueError as e:
             error_text = getattr(e, 'message', None) or e.__str__()
             error_msgs = ['day is out of range', 'day must be in']
             if (
                 (error_msgs[0] in error_text or error_msgs[1] in error_text) and
-                not(self._token_day or hasattr(self, '_token_weekday'))
+                not (self._token_day or hasattr(self, '_token_weekday'))
             ):
                 _, tail = calendar.monthrange(params['year'], params['month'])
                 params['day'] = tail
@@ -309,11 +312,11 @@ class _parser(object):
     def _get_datetime_obj_params(self):
         if not self.now:
             self._set_relative_base()
-        #UWAGA TUTAJ TE PARAMETRY
+        # UWAGA TUTAJ TE PARAMETRY
         params = {
-            'day': self.day or 20,
-            'month': self.month or self.now.month,
-            'year': self.year or self.now.year,
+            'day': self.day or None,
+            'month': self.month or None,
+            'year': self.year or None,
             'hour': 0, 'minute': 0, 'second': 0, 'microsecond': 0,
         }
         return params
@@ -360,7 +363,7 @@ class _parser(object):
 
         token_weekday, _ = getattr(self, '_token_weekday', (None, None))
 
-        if token_weekday and not(self._token_year or self._token_month or self._token_day):
+        if token_weekday and not (self._token_year or self._token_month or self._token_day):
             day_index = calendar.weekday(dateobj.year, dateobj.month, dateobj.day)
             day = token_weekday[:3].lower()
             steps = 0
@@ -437,12 +440,14 @@ class _parser(object):
         tokens = tokenizer(datestring)
         po = cls(tokens.tokenize(), settings)
         dateobj = po._results()
+        if dateobj.year == 'Undefined' and dateobj.month is 'Undefined' and dateobj.day is 'Undefined':
+            dateobj = None
         # UWAGA CZYLI TUTAJ DOBRZE
         # correction for past, future if applicable
-        dateobj = po._correct_for_time_frame(dateobj)
+        # dateobj = po._correct_for_time_frame(dateobj)
 
         # correction for preference of day: beginning, current, end
-        #UWAGA CZYLI TUTAJ ZMIENIA NA NOW ;3
+        # UWAGA CZYLI TUTAJ ZMIENIA NA NOW ;3
         # dateobj = po._correct_for_day(dateobj)
 
         return dateobj, po._get_period()
@@ -478,10 +483,11 @@ class _parser(object):
                     except ValueError:
                         pass
             else:
-                if not fuzzy:
-                    raise ValueError('Unable to parse: %s' % token)
-                else:
-                    return []
+                return []
+                # if not fuzzy:
+                #     raise ValueError('Unable to parse: %s' % token)
+                # else:
+                #     return []
 
         def parse_alpha(token, skip_component=None):
             type = 1
@@ -518,11 +524,14 @@ class tokenizer(object):
     letters = u'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
     nonwords = u"./\()\"',.;<>~!@#$%^&*|+=[]{}`~?-     "
 
-    def _isletter(self, tkn): return tkn in self.letters
+    def _isletter(self, tkn):
+        return tkn in self.letters
 
-    def _isdigit(self, tkn): return tkn in self.digits
+    def _isdigit(self, tkn):
+        return tkn in self.digits
 
-    def _isnonword(self, tkn): return tkn in self.nonwords
+    def _isnonword(self, tkn):
+        return tkn in self.nonwords
 
     def __init__(self, ds):
         self.instream = StringIO(ds)
@@ -562,3 +571,83 @@ class tokenizer(object):
                     token = nextchar
             else:
                 token += nextchar
+
+
+_DAYS_IN_MONTH = [None, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+
+
+def _is_leap(year):
+    "year -> 1 if leap year, else 0."
+    return year % 4 == 0 and (year % 100 != 0 or year % 400 == 0)
+
+
+def _days_in_month(year, month):
+    "year, month -> number of days in that month in that year."
+    assert 1 <= month <= 12, month
+    if month == 2 and _is_leap(year):
+        return 29
+    return _DAYS_IN_MONTH[month]
+
+
+def _is_year_valid(year):
+    now = datetime.now()
+    return year is not None and not isinstance(year, str) and 1979 <= year <= now.year
+
+
+class MyDateTime:
+
+    def __init__(self, year, month, day, *args, **kargs) -> None:
+        self.format = ""
+        if _is_year_valid(year):
+            self.format += "{:04d}-"
+            self.year = year
+        else:
+            self.year = 'Undefined'
+            self.format += "{:s}-"
+        if month is None or not 1 <= month <= 12:
+            self.format += "{:s}-"
+            self.month = 'Undefined'
+        else:
+            self.format += "{:02d}-"
+            self.month = month
+        if self.month is not 'Undefined':
+            dim = _days_in_month(year, month)
+            if day is None or not 1 <= day <= dim:
+                self.format += "{:s}"
+                self.day = 'Undefined'
+            else:
+                self.format += "{:02d}"
+                self.day = day
+        else:
+            self.format += "{:s}"
+            self.day = 'Undefined'
+
+    def __str__(self):
+        return self.format.format(self.year, self.month, self.day)
+
+# class MyDateTime:
+#
+#     def __init__(self, year, month, day, *args, **kargs) -> None:
+#         self.format = ""
+#         if year is None:
+#             self.year = 'Undefined'
+#             self.format += "{:s}-"
+#         else:
+#             self.format += "{:04d}-"
+#             self.year = year
+#         if month is None or not 1 <= month <= 12:
+#             self.format += "{:s}-"
+#             self.month = 'Undefined'
+#         else:
+#             self.format += "{:02d}-"
+#             self.month = month
+#         dim = _days_in_month(year, month)
+#         if day is None or not 1 <= day <= dim:
+#             self.format += "{:s}"
+#             self.day = 'Undefined'
+#         else:
+#             self.format += "{:02d}"
+#             self.day = day
+#
+#     def __str__(self):
+#         return self.format.format(self.year, self.month, self.day)

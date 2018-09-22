@@ -93,6 +93,7 @@ class ExactLanguageSearch:
     def parse_item(self, parser, item, translated_item, parsed, need_relative_base):
         item = item.replace('ngày', '')
         item = item.replace('am', '')
+        # TUTAJ TEŻ ZWRACA DATETIME
         pre_parsed_item = parser.get_date_data(item)
         is_relative = date_is_relative(translated_item)
         if need_relative_base:
@@ -116,6 +117,7 @@ class ExactLanguageSearch:
             need_relative_base = False
         for i, item in enumerate(to_parse):
             if len(item) > 2:
+                # TUTAJ ZWRACA DETTIME
                 parsed_item = self.parse_item(parser, item, translated[i], parsed, need_relative_base)
                 if parsed_item['date_obj']:
                     parsed.append(parsed_item)
@@ -147,6 +149,7 @@ class ExactLanguageSearch:
                                 substrings.append(substrings_best[k])
         return parsed, substrings
 
+# TTUAJ PARSOWANIE
     def search_parse(self, shortname, text, settings):
         translated, original = self.search(shortname, text, settings)
         bad_translate_with_search = ['vi', 'hu']   # splitting done by spaces and some dictionary items contain spaces
@@ -218,7 +221,9 @@ class DateSearchWithDetection:
         """
 
         language_shortname = self.detect_language(text=text, languages=languages)
-        if not language_shortname:
-            return {'Language': None, 'Dates': None}
+        # language_shortname = "pl"
+        if not language_shortname or language_shortname != "pl":
+            language_shortname="en"
+            # return {'Language': None, 'Dates': None}
         return {'Language': language_shortname, 'Dates': self.search.search_parse(language_shortname, text,
                                                                                   settings=settings)}
