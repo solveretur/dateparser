@@ -172,6 +172,7 @@ class _DateLocaleParser(object):
         self._translated_date = None
         self._translated_date_with_formatting = None
 
+    # TA JEST ŁADOWANA PODCZAS PARSOWANIA
     @classmethod
     def parse(cls, locale, date_string, date_formats=None, settings=None):
         instance = cls(locale, date_string, date_formats, settings)
@@ -179,12 +180,13 @@ class _DateLocaleParser(object):
 
     def _parse(self):
         for parser in (
-            self._try_timestamp,
-            self._try_freshness_parser,
-            self._try_given_formats,
+            # self._try_timestamp,
+            # self._try_freshness_parser,
+            # self._try_given_formats,
             self._try_parser,
-            self._try_hardcoded_formats,
+            # self._try_hardcoded_formats,
         ):
+            # TUTAJ ZWRACA DATETIME I SPRAWDŹ DO IS_VALID
             date_obj = parser()
             if self._is_valid_date_obj(date_obj):
                 return date_obj
@@ -200,12 +202,14 @@ class _DateLocaleParser(object):
     def _try_freshness_parser(self):
         return freshness_date_parser.get_date_data(self._get_translated_date(), self._settings)
 
+    # TA METODA W TATMYM FORZE ZWRACA DATETIME
     def _try_parser(self):
         _order = self._settings.DATE_ORDER
         try:
             if self._settings.PREFER_LOCALE_DATE_ORDER:
                 if self._settings._default:
                     self._settings.DATE_ORDER = self.locale.info.get('date_order', _order)
+            #         TO FINALNA METODA ZWRACAJĄCA DATETIME
             date_obj, period = date_parser.parse(
                 self._get_translated_date(), settings=self._settings)
             self._settings.DATE_ORDER = _order
@@ -401,6 +405,7 @@ class DateDataParser(object):
         date_string = sanitize_date(date_string)
 
         for locale in self._get_applicable_locales(date_string):
+            # TUTAJ ZWRACA DATETIME  I TRZEBA ZMIENIĆ NA STRINGA
             parsed_date = _DateLocaleParser.parse(
                 locale, date_string, date_formats, settings=self._settings)
             if parsed_date:
