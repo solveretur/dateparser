@@ -151,6 +151,7 @@ class ExactLanguageSearch:
 
 # TTUAJ PARSOWANIE
     def search_parse(self, shortname, text, settings):
+        #TUTAJ TO ZWRACA TO PO DZIELENIU PO KROPCE
         translated, original = self.search(shortname, text, settings)
         bad_translate_with_search = ['vi', 'hu']   # splitting done by spaces and some dictionary items contain spaces
         if shortname not in bad_translate_with_search:
