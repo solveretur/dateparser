@@ -271,7 +271,7 @@ class _parser(object):
             for token, type, _ in self.unset_tokens:
                 if type == 0:
                     params.update({attr: int(token)})
-                    datetime(**params)
+                    MyDateTime(**params)
                     setattr(self, '_token_%s' % attr, token)
                     setattr(self, attr, int(token))
 
@@ -591,12 +591,12 @@ def _days_in_month(year, month):
 
 def _is_year_valid(year):
     now = datetime.now()
-    return year is not None and not isinstance(year, str) and 1979 <= year <= now.year
+    return year is not None and not isinstance(year, str) and 1950 <= year <= now.year
 
 
 class MyDateTime:
 
-    def __init__(self, year, month, day, *args, **kargs) -> None:
+    def __init__(self, year=None, month=None, day=None, *args, **kargs) -> None:
         self.format = ""
         if _is_year_valid(year):
             self.format += "{:04d}-"
