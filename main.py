@@ -31,7 +31,7 @@ test = "2/08/2017"
 # =====================================================
 # fname = '/home/przemek/Pobrane/numery_faktur.csv'
 # with open(fname) as f:
-#     content = f.readlines()
+#     content = f.read()
 # # you may also want to remove whitespace characters like `\n` at the end of each line
 # content = [x.strip() for x in content]
 #
@@ -65,10 +65,11 @@ test = "2/08/2017"
 # text_file.close()
 
 # ==================================================================
-fname = '/home/przemek/Pobrane/numery_faktur.csv'
+nazwa_pliku = 'strona_z_wikipedii_eng'
+fname = '/home/przemek/Desktop/pracai/dane/' + nazwa_pliku + '.txt'
 print("Odczytuje plik wejściowy")
 with open(fname) as f:
-    content = f.readlines()
+    content = f.read()
 print("Odczytałem plik")
 
 from random import randint
@@ -81,25 +82,23 @@ allcontent = ""
 
 print("Losuje 300 encji")
 
-for i in range(300):
-    while True:
-        rand = randint(0, len(content) - 1)
-        if rand not in used_ids:
-            used_ids.append(rand)
-            random_conten.append(content[rand])
-            break
-
+# for i in range(300):
+#     while True:
+#         rand = randint(0, len(content) - 1)
+#         if rand not in used_ids:
+#             used_ids.append(rand)
+#             random_conten.append(content[rand])
+#             break
+#
 results = ""
-print("Tworze jeden string z wylosowanych encji")
-for l in random_conten:
-    allcontent += l
+# print("Tworze jeden string z wylosowanych encji")
+# for l in random_conten:
+#     allcontent += l
 
-results += allcontent
+# results += allcontent
 print("Rozpoczynam szukanie dat")
-d = search.search_dates(allcontent, languages=["pl"])
+d = search.search_dates(content, languages=["en"])
 print("Zakończyłem szukanie dat")
-
-
 
 print("Dodaje je do pliku")
 results += "\n=============WYzNIKI=================\n"
@@ -111,6 +110,7 @@ if d is not None:
 results += '\n'
 print("Zapisuje plik")
 
-text_file = open("/home/przemek/Pobrane/result_not_line_by_linev2.csv", "w")
-text_file.write(results)
-text_file.close()
+print(results)
+# text_file = open("/home/przemek/Desktop/pracai/dane/wyniki/" + nazwa_pliku + ".csv", "w")
+# text_file.write(results)
+# text_file.close()

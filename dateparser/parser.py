@@ -610,9 +610,9 @@ class MyDateTime:
         else:
             self.format += "{:02d}-"
             self.month = month
-        if self.month is not 'Undefined':
+        if self.month is not 'Undefined' and self.year is not 'Undefined':
             dim = _days_in_month(year, month)
-            if day is None or not 1 <= day <= dim:
+            if day is None or isinstance(day, str) or not 1 <= day <= dim:
                 self.format += "{:s}"
                 self.day = 'Undefined'
             else:
