@@ -224,7 +224,7 @@ class DateSearchWithDetection:
         language_shortname = self.detect_language(text=text, languages=languages)
         # language_shortname = "pl"
         if not language_shortname or language_shortname != "pl":
-            language_shortname="en"
+            language_shortname="pl"
             # return {'Language': None, 'Dates': None}
         return {'Language': language_shortname, 'Dates': self.search.search_parse(language_shortname, text,
                                                                                   settings=settings)}
