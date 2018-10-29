@@ -590,7 +590,7 @@ def _days_in_month(year, month):
 
 
 def _is_year_valid(year):
-    return year is not None and not isinstance(year, str) and 1950 <= year <= 2150
+    return year is not None and not isinstance(year, str) and 1950 <= year <= 2050
 
 
 class MyDateTime:
