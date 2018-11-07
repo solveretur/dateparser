@@ -163,7 +163,7 @@ class ExactLanguageSearch:
             parsed, substrings = self.parse_found_objects(parser=parser, to_parse=original,
                                                           original=original, translated=translated, settings=settings)
         parser._settings = Settings()
-        return list(zip(substrings, [i['date_obj'] for i in parsed]))
+        return list(zip(substrings, [str(i['date_obj']) for i in parsed]))
 
 
 class DateSearchWithDetection:
