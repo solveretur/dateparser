@@ -440,7 +440,7 @@ class _parser(object):
         tokens = tokenizer(datestring)
         po = cls(tokens.tokenize(), settings)
         dateobj = po._results()
-        if dateobj.year == 'Undefined' and dateobj.month is 'Undefined' and dateobj.day is 'Undefined':
+        if dateobj.year == UNDEFINED and dateobj.month is UNDEFINED and dateobj.day is UNDEFINED:
             dateobj = None
         # UWAGA CZYLI TUTAJ DOBRZE
         # correction for past, future if applicable
@@ -593,6 +593,9 @@ def _is_year_valid(year):
     return year is not None and not isinstance(year, str) and 1950 <= year <= 2050
 
 
+UNDEFINED = 'Undefined'
+
+
 class MyDateTime:
 
     def __init__(self, year=None, month=None, day=None, *args, **kargs) -> None:
@@ -601,25 +604,25 @@ class MyDateTime:
             self.format += "{:04d}-"
             self.year = year
         else:
-            self.year = 'Undefined'
+            self.year = UNDEFINED
             self.format += "{:s}-"
         if month is None or not 1 <= month <= 12:
             self.format += "{:s}-"
-            self.month = 'Undefined'
+            self.month = UNDEFINED
         else:
             self.format += "{:02d}-"
             self.month = month
-        if self.month is not 'Undefined':
+        if self.month is not UNDEFINED:
             dim = _days_in_month(year, month)
             if day is None or not 1 <= day <= dim:
                 self.format += "{:s}"
-                self.day = 'Undefined'
+                self.day = UNDEFINED
             else:
                 self.format += "{:02d}"
                 self.day = day
         else:
             self.format += "{:s}"
-            self.day = 'Undefined'
+            self.day = UNDEFINED
 
     def __str__(self):
         return self.format.format(self.year, self.month, self.day)
