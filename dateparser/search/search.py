@@ -163,21 +163,7 @@ class ExactLanguageSearch:
             parsed, substrings = self.parse_found_objects(parser=parser, to_parse=original,
                                                           original=original, translated=translated, settings=settings)
         parser._settings = Settings()
-        return list(zip(substrings, [str(replace_for_dmy(i['date_obj'])) for i in parsed]))
-
-
-def replace_for_dmy(my_datetime_object):
-    from dateparser.parser import UNDEFINED
-    from dateparser.parser import MyDateTime
-    if isinstance(my_datetime_object, MyDateTime):
-        if my_datetime_object.day is not None and my_datetime_object.month is not None:
-            if my_datetime_object.day is not UNDEFINED and my_datetime_object.day is not UNDEFINED:
-                if int(my_datetime_object.day) < 10 and int(my_datetime_object.month) < 10:
-                    tmp = my_datetime_object.day
-                    my_datetime_object.day = my_datetime_object.month
-                    my_datetime_object.month = tmp
-                    return my_datetime_object
-    return my_datetime_object
+        return list(zip(substrings, [str(i['date_obj']) for i in parsed]))
 
 
 class DateSearchWithDetection:
