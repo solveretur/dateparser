@@ -42,7 +42,7 @@ def replace_for_dmy(my_datetime_object):
     if isinstance(my_datetime_object, MyDateTime):
         if my_datetime_object.day is not None and my_datetime_object.month is not None:
             if my_datetime_object.day is not UNDEFINED and my_datetime_object.day is not UNDEFINED:
-                if int(my_datetime_object.day) < 12 and int(my_datetime_object.month) < 12:
+                if int(my_datetime_object.day) <= 12 and int(my_datetime_object.month) <= 12:
                     tmp = my_datetime_object.day
                     my_datetime_object.day = my_datetime_object.month
                     my_datetime_object.month = tmp
