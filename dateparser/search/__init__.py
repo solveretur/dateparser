@@ -33,4 +33,28 @@ def search_dates(text, languages=None, settings=None):
     # TUTAJ ZWRACA WYNIKI
     result = _search_with_detection.search_dates(text=text, languages=languages, settings=settings)
     if result['Dates']:
-        return result['Dates']
+        return replace_data_in_tuples(result['Dates'])
+
+
+def replace_for_dmy(my_datetime_object):
+    from dateparser.parser import UNDEFINED
+    from dateparser.parser import MyDateTime
+    if isinstance(my_datetime_object, MyDateTime):
+        if my_datetime_object.day is not None and my_datetime_object.month is not None:
+            if my_datetime_object.day is not UNDEFINED and my_datetime_object.day is not UNDEFINED:
+                if int(my_datetime_object.day) < 12 and int(my_datetime_object.month) < 12:
+                    tmp = my_datetime_object.day
+                    my_datetime_object.day = my_datetime_object.month
+                    my_datetime_object.month = tmp
+                    return str(my_datetime_object)
+    return str(my_datetime_object)
+
+
+def is_substring_matches_to_replace(substring):
+    import regex as re
+    pattern = re.compile(r'(?<!\d)\d{1,2}[-|\s|\.|\/]\d{1,2}[-|\s|\.|\/]\d{2,4}(?!\d)')
+    return re.findall(pattern, substring)
+
+
+def replace_data_in_tuples(tuple_list):
+    return [(k, replace_for_dmy(v)) if is_substring_matches_to_replace(k) else (k, str(v)) for (k, v) in tuple_list]
