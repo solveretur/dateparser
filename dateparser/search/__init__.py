@@ -53,7 +53,11 @@ def replace_for_dmy(my_datetime_object):
 def is_substring_matches_to_replace(substring):
     import regex as re
     pattern = re.compile(r'(?<!\d)\d{1,2}[-|\s|\.|\/]\d{1,2}[-|\s|\.|\/]\d{2,4}(?!\d)')
-    return re.findall(pattern, substring)
+    re1 = re.findall(pattern, substring)
+    if re1:
+        return True
+    pattern2 = re.compile(r'(?<!\d)\d{1,2}[-|\s|\.|\/]\d{1,2}(?!\d)(?![-|\s|\.|\/])')
+    return re.findall(pattern2,substring)
 
 
 def replace_data_in_tuples(tuple_list):
