@@ -56,8 +56,15 @@ def is_substring_matches_to_replace(substring):
     re1 = re.findall(pattern, substring)
     if re1:
         return True
+    pattern3 = re.compile(r'(?<!\d)\d{2,4}[-|\s|\.|\/]\d{1,2}[-|\s|\.|\/]\d{1,2}(?!\d)(?![-|\s|\.|\/])')
+    re3 = re.findall(pattern3,substring)
+    if re3:
+        return False
     pattern2 = re.compile(r'(?<!\d)\d{1,2}[-|\s|\.|\/]\d{1,2}(?!\d)(?![-|\s|\.|\/])')
-    return re.findall(pattern2,substring)
+    re2 = re.findall(pattern2, substring)
+    if re2:
+        return True
+    return False
 
 
 def replace_data_in_tuples(tuple_list):
