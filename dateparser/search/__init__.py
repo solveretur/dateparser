@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 from dateparser.search.search import DateSearchWithDetection
+import regex as re
 
 _search_with_detection = DateSearchWithDetection()
 
@@ -31,9 +32,9 @@ def search_dates(text, languages=None, settings=None):
 
         """
     # TUTAJ ZWRACA WYNIKI
-    result = _search_with_detection.search_dates(text=text, languages=languages, settings=settings)
+    result = _search_with_detection.search_dates(text=replace_all_tokens_which_destroy_splitting(text), languages=languages, settings=settings)
     if result['Dates']:
-        return replace_data_in_tuples(result['Dates'])
+        return remove_falses(replace_data_in_tuples(result['Dates']))
 
 
 def replace_for_dmy(my_datetime_object):
@@ -57,7 +58,7 @@ def is_substring_matches_to_replace(substring):
     if re1:
         return True
     pattern3 = re.compile(r'(?<!\d)\d{2,4}[-|\s|\.|\/]\d{1,2}[-|\s|\.|\/]\d{1,2}(?!\d)(?![-|\s|\.|\/])')
-    re3 = re.findall(pattern3,substring)
+    re3 = re.findall(pattern3, substring)
     if re3:
         return False
     pattern2 = re.compile(r'(?<!\d)\d{1,2}[-|\s|\.|\/]\d{1,2}(?!\d)(?![-|\s|\.|\/])')
@@ -69,3 +70,20 @@ def is_substring_matches_to_replace(substring):
 
 def replace_data_in_tuples(tuple_list):
     return [(k, replace_for_dmy(v)) if is_substring_matches_to_replace(k) else (k, str(v)) for (k, v) in tuple_list]
+
+
+def replace_all_tokens_which_destroy_splitting(text):
+    split_dates_from_to = re.compile(r'(?<=(\d{4}))-(?=(\d{4}))')
+    t1 = re.sub(split_dates_from_to, ' TTTT ', text)
+    remove_year = re.compile(r'(?<=\d{4})(r\.)')
+    t2 = re.sub(remove_year, '', t1)
+    remove_slash_and_minus_and_backslash = re.compile(r'(?<=\d)(\\|\/|\.|-|,)(?=[a-zA-z])')
+    t3 = re.sub(remove_slash_and_minus_and_backslash, ' TTTT ', t2)
+    remove_minus_and_backlash = re.compile(r'(?<=[a-zA-z])(\\|\/|\.|-|,)(?=\d)')
+    t4 = re.sub(remove_minus_and_backlash, ' TTTT ', t3)
+    return t4
+
+
+def remove_falses(tuple_list):
+    falses_pattern = re.compile(r'(Undefined-\d{2}-Undefined)|(Undefined-Undefined-\d{2})')
+    return list(filter(lambda x: (re.match(falses_pattern, x[1]) is None), tuple_list))
