@@ -161,7 +161,7 @@ class Locale(object):
         if settings.NORMALIZE:
             if self._normalized_relative_translations is None:
                 self._normalized_relative_translations = (
-                        self._generate_relative_translations(normalize=True))
+                    self._generate_relative_translations(normalize=True))
             return self._normalized_relative_translations
         else:
             if self._relative_translations is None:
@@ -200,7 +200,7 @@ class Locale(object):
                 elif word.strip('()\"\'{}[],.،') in dictionary and word not in dashes:
                     punct = word[len(word.strip('()\"\'{}[],.،')):]
                     if punct and dictionary[word.strip('()\"\'{}[],.،')]:
-                        translated_chunk.append(dictionary[word.strip('()\"\'{}[],.،')]+punct)
+                        translated_chunk.append(dictionary[word.strip('()\"\'{}[],.،')] + punct)
                     else:
                         translated_chunk.append(dictionary[word.strip('()\"\'{}[],.،')])
                     original_chunk.append(original_tokens[i])
@@ -253,14 +253,14 @@ class Locale(object):
                           6: '[\r\n؟!\.…]+(?:\s|$)*'}  # Arabic and Farsi
         if 'sentence_splitter_group' not in self.info:
             split_reg = abbreviation_string + splitters_dict[1]
-            sentences = re.split(split_reg, string)
+            sentences = get_splitted_strings_with_indexes(split_reg, string)
         else:
             split_reg = abbreviation_string + splitters_dict[self.info['sentence_splitter_group']]
-            sentences = re.split(split_reg, string)
+            sentences = get_splitted_strings_with_indexes(split_reg, string)
 
         for i in sentences:
             if not i:
-                sentences.remove(i)
+                sentences.pop(i, None)
         return sentences
 
     def _simplify_split_align(self, original, settings):
@@ -535,3 +535,40 @@ class Locale(object):
         }
         name = '{language}ParserInfo'.format(language=self.info['name'])
         return type(name, bases=[base_cls], dict=attributes)
+
+
+def get_split_sentences_indexes(regex, string):
+    indexes = []
+    size = len(string)
+    brake_indexes = [v.span() for v in re.finditer(regex, string)]
+    if brake_indexes is None or len(brake_indexes) == 0:
+        indexes.append((0, size - 1))
+        return indexes
+    brake_index = 0
+    current_start = 0
+    current_index = 0
+    while current_index < size:
+        if brake_index == len(brake_indexes):
+            indexes.append((current_start, size - 1))
+            break
+        brake_start, brake_stop = brake_indexes[brake_index]
+        if brake_start == 0:
+            current_start = brake_stop
+            current_index = brake_stop
+            brake_index += 1
+            continue
+        if current_index == brake_start:
+            brake_index += 1
+            indexes.append((current_start, current_index - 1))
+            current_start = brake_stop
+            current_index = brake_stop - 1
+        current_index += 1
+    return indexes
+
+
+def get_splitted_strings_with_indexes(regex, string):
+    indexes = get_split_sentences_indexes(regex, string)
+    splitted = re.split(regex, string)
+    if len(indexes) != len(splitted):
+        raise RuntimeError
+    return dict(zip(splitted,indexes))
