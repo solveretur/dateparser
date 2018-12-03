@@ -186,27 +186,31 @@ class Locale(object):
         dictionary = self._get_dictionary(settings=settings)
         translated = []
         original = []
-        for sentence in sentences:
+        for sentence_tuple in sentences:
+            sentence = sentence_tuple[0]
             original_tokens, simplified_tokens = self._simplify_split_align(sentence, settings=settings)
             translated_chunk = []
             original_chunk = []
-            for i, word in enumerate(simplified_tokens):
+            sentence_start_index = sentence_tuple[1][0]
+            original_tokens_with_indexes = get_index_of_tokens(sentence,sentence_start_index,original_tokens)
+            for i, token in enumerate(simplified_tokens):
+                word = token[0]
                 if word == '' or word == ' ':
                     translated_chunk.append(word)
-                    original_chunk.append(original_tokens[i])
+                    original_chunk.append(original_tokens_with_indexes[i])
                 elif word in dictionary and word not in dashes:
                     translated_chunk.append(dictionary[word])
-                    original_chunk.append(original_tokens[i])
+                    original_chunk.append(original_tokens_with_indexes[i])
                 elif word.strip('()\"\'{}[],.،') in dictionary and word not in dashes:
                     punct = word[len(word.strip('()\"\'{}[],.،')):]
                     if punct and dictionary[word.strip('()\"\'{}[],.،')]:
                         translated_chunk.append(dictionary[word.strip('()\"\'{}[],.،')] + punct)
                     else:
                         translated_chunk.append(dictionary[word.strip('()\"\'{}[],.،')])
-                    original_chunk.append(original_tokens[i])
+                    original_chunk.append(original_tokens_with_indexes[i])
                 elif self._token_with_digits_is_ok(word):
                     translated_chunk.append(word)
-                    original_chunk.append(original_tokens[i])
+                    original_chunk.append(original_tokens_with_indexes[i])
                 else:
                     if translated_chunk:
                         translated.append(translated_chunk)
@@ -220,7 +224,7 @@ class Locale(object):
             if "in" in translated[i]:
                 translated[i] = self._clear_future_words(translated[i])
             translated[i] = self._join_chunk(list(filter(bool, translated[i])), settings=settings)
-            original[i] = self._join_chunk(list(filter(bool, original[i])), settings=settings)
+            original[i] = self._join_chunk_tuple(list(filter(bool, original[i][0])), settings=settings)
         return translated, original
 
     def _get_abbreviations(self, settings):
@@ -258,9 +262,9 @@ class Locale(object):
             split_reg = abbreviation_string + splitters_dict[self.info['sentence_splitter_group']]
             sentences = get_splitted_strings_with_indexes(split_reg, string)
 
-        for i in sentences:
-            if not i:
-                sentences.pop(i, None)
+        # for i in sentences:
+        #     if not i:
+        #         sentences.pop(i, None)
         return sentences
 
     def _simplify_split_align(self, original, settings):
@@ -355,6 +359,12 @@ class Locale(object):
             return self._join(chunk, separator="", settings=settings)
         else:
             return re.sub('\s{2,}', ' ', " ".join(chunk))
+
+    def _join_chunk_tuple(self, chunk, settings):
+        if 'no_word_spacing' in self.info:
+            return self._join(chunk, separator="", settings=settings)
+        else:
+            return re.sub('\s{2,}', ' ', " ".join(chunk[0]))
 
     def _token_with_digits_is_ok(self, token):
         if 'no_word_spacing' in self.info:
@@ -540,6 +550,9 @@ class Locale(object):
 def get_split_sentences_indexes(regex, string):
     indexes = []
     size = len(string)
+    if not regex:
+        indexes.append((0, size-1))
+        return indexes
     brake_indexes = [v.span() for v in re.finditer(regex, string)]
     if brake_indexes is None or len(brake_indexes) == 0:
         indexes.append((0, size - 1))
@@ -568,7 +581,31 @@ def get_split_sentences_indexes(regex, string):
 
 def get_splitted_strings_with_indexes(regex, string):
     indexes = get_split_sentences_indexes(regex, string)
-    splitted = re.split(regex, string)
+    splitted = [r for r in re.split(regex, string) if r]
     if len(indexes) != len(splitted):
         raise RuntimeError
-    return dict(zip(splitted,indexes))
+    return list(zip(splitted, indexes))
+
+def find_all(a_str, sub):
+    result = []
+    start = 0
+    while True:
+        start = a_str.find(sub, start)
+        if start == -1:
+            break
+        result.append((start, start + len(sub) - 1))
+        start += len(sub)
+    return result
+
+def get_index_of_token(sentence, sentence_start_index, token):
+    indexes = find_all(sentence,token)
+    return [(v[0] + sentence_start_index, v[1] + sentence_start_index) for v in indexes]
+
+
+def get_index_of_tokens(sentence, sentence_start_index, tokens):
+    result = []
+    for token in tokens:
+        indexes = get_index_of_token(sentence, sentence_start_index, token)
+        for index in indexes:
+            result.append((token, index))
+    return result
