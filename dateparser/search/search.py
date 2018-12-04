@@ -121,7 +121,7 @@ class ExactLanguageSearch:
                 parsed_item = self.parse_item(parser, item, translated[i], parsed, need_relative_base)
                 if parsed_item['date_obj']:
                     parsed.append(parsed_item)
-                    substrings.append(original[i].strip(' .,:()[]-'))
+                    substrings.append((original[i][0].strip(' .,:()[]-'),original[1]))
                     pass
                 else:
                     possible_splits = self.split_if_not_parsed(item, original[i])
@@ -152,16 +152,17 @@ class ExactLanguageSearch:
 # TTUAJ PARSOWANIE
     def search_parse(self, shortname, text, settings):
         #TUTAJ TO ZWRACA TO PO DZIELENIU PO KROPCE
-        translated, original = self.search(shortname, text, settings)
+        translated, original_i = self.search(shortname, text, settings)
+        original = [o[0] for o in original_i]
         bad_translate_with_search = ['vi', 'hu']   # splitting done by spaces and some dictionary items contain spaces
-        if shortname not in bad_translate_with_search:
-            parser = DateDataParser(languages=['en'], settings=settings)
-            parsed, substrings = self.parse_found_objects(parser=parser, to_parse=translated,
+        # if shortname not in bad_translate_with_search:
+        parser = DateDataParser(languages=['en'], settings=settings)
+        parsed, substrings = self.parse_found_objects(parser=parser, to_parse=translated,
                                                           original=original, translated=translated, settings=settings)
-        else:
-            parser = DateDataParser(languages=[shortname], settings=settings)
-            parsed, substrings = self.parse_found_objects(parser=parser, to_parse=original,
-                                                          original=original, translated=translated, settings=settings)
+        # else:
+        #     parser = DateDataParser(languages=[shortname], settings=settings)
+        #     parsed, substrings = self.parse_found_objects(parser=parser, to_parse=original,
+        #                                                   original=original, translated=translated, settings=settings)
         parser._settings = Settings()
         return list(zip(substrings, [i['date_obj'] for i in parsed]))
 

@@ -193,8 +193,7 @@ class Locale(object):
             original_chunk = []
             sentence_start_index = sentence_tuple[1][0]
             original_tokens_with_indexes = get_index_of_tokens(sentence,sentence_start_index,original_tokens)
-            for i, token in enumerate(simplified_tokens):
-                word = token[0]
+            for i, word in enumerate(simplified_tokens):
                 if word == '' or word == ' ':
                     translated_chunk.append(word)
                     original_chunk.append(original_tokens_with_indexes[i])
@@ -224,7 +223,7 @@ class Locale(object):
             if "in" in translated[i]:
                 translated[i] = self._clear_future_words(translated[i])
             translated[i] = self._join_chunk(list(filter(bool, translated[i])), settings=settings)
-            original[i] = self._join_chunk_tuple(list(filter(bool, original[i][0])), settings=settings)
+            original[i] = self._join_chunk_tuple(list(filter(bool, original[i])), settings=settings)
         return translated, original
 
     def _get_abbreviations(self, settings):
@@ -364,7 +363,10 @@ class Locale(object):
         if 'no_word_spacing' in self.info:
             return self._join(chunk, separator="", settings=settings)
         else:
-            return re.sub('\s{2,}', ' ', " ".join(chunk[0]))
+            chunks = [c[0] for c in chunk]
+            indeks_from = chunk[0][1][0]
+            indeks_to=chunk[len(chunk)-1][1][1]
+            return (re.sub('\s{2,}', ' ', " ".join(chunks)),(indeks_from,indeks_to))
 
     def _token_with_digits_is_ok(self, token):
         if 'no_word_spacing' in self.info:

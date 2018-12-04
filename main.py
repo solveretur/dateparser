@@ -66,7 +66,7 @@ import dateparser.search as search
 
 # ==================================================================
 # #
-j = 'C:/Users/Mama/Documents/pracai2/dane/nazwyPlikówIOczekiwane.json'
+j = '/home/przemek/Desktop/pracai/dane/nazwyPlikówIOczekiwane.json'
 with open(j, encoding="utf8") as f:
     nazwyPlikowIOczekiwane = f.read()
 
@@ -81,7 +81,7 @@ e = next(filter(lambda x: x['name'] == nazwa_pliku_z_format, js['files']), None)
 
 print(e['expected'])
 
-fname = 'C:/Users/Mama/Documents/pracai2/dane/' + nazwa_pliku_z_format
+fname = '/home/przemek/Desktop/pracai/dane/' + nazwa_pliku_z_format
 print("Odczytuje plik wejściowy")
 
 
