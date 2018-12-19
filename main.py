@@ -144,6 +144,7 @@ import dateparser.search as search
 
 import datefinder
 
+
 def remove_duplicates(substring_list):
     used_spans = []
     res = []
@@ -176,99 +177,179 @@ def validate(substring_list):
 
 
 def find_dates_substring(text):
-    dates = datefinder.find_dates(text,source= True, index=True)
-    return [(k,v) for k,v in dates]
+    dates = datefinder.find_dates(text, source=True, index=True)
+    return [(k, v) for k, v in dates]
+
+
+def choose_best_parsed(parsed_pl, parsed_en, search_result):
+    if parsed_pl is None and parsed_en is None and search_result is None:
+        return None
+    if parsed_pl is not None and parsed_en is None and search_result is None:
+        return parsed_pl
+    if parsed_en is not None and parsed_pl is None and search_result is None:
+        return parsed_en
+    if search_result is not None and parsed_pl is None and parsed_en is None:
+        return search_result
+    if parsed_pl is not None and parsed_en is not None and search_result is None:
+        if len(str(parsed_pl)) > len(str(parsed_en)):
+            return parsed_en
+        else:
+            return parsed_pl
+    if search_result is not None:
+        if len(search_result) > 1:
+            return search_result
+        if len(search_result) == 1:
+            from_search_result = search_result[0]
+            smallest = from_search_result
+            if parsed_pl is not None and len(str(smallest)) > len(str(parsed_pl)):
+                smallest = parsed_pl
+            if parsed_en is not None and len(str(smallest)) > len(str(parsed_en)):
+                smallest = parsed_en
+            return smallest
+    return None
 
 
 import dateparser
 import dateparser.search as search
 
 
+def findIndexesOfSearched(originalIndex, originalSubstring, searchResult):
+    i = originalSubstring.find(searchResult[0])
+    return originalIndex[0] + i, originalIndex[0] + i + len(searchResult[0])
+
+
 def find_dates(text):
     substrings = find_dates_substring(text)
     dates = []
-    for s,i in substrings:
+    for s, i in substrings:
         substring = s
-        parsed_date = dateparser.parse(substring, languages=["pl"])
-        if parsed_date is None:
-            parsed_date = dateparser.parse(substring, languages=["en"])
-            if parsed_date is None:
-                search_results = search.search_dates(substring, languages=["pl"])
-                if search_results is None:
-                    continue
-                search_results = [x[1] for x in search.search_dates(substring, languages=["pl"])]
-                if len(search_results) == 1:
-                    dates.append((i, search_results[0]))
-                elif len(search_results) > 1:
-                    dates.extend([(i, x[1]) for x in search_results])
-            else:
-                dates.append((i, parsed_date))
+        parsed_date_pl = dateparser.parse(substring, languages=["pl"])
+        parsed_date_en = dateparser.parse(substring, languages=["en"])
+        search_results = search.search_dates(substring, languages=["pl"])
+        best_choose = choose_best_parsed(parsed_date_pl, parsed_date_en, search_results)
+        if best_choose is None:
+            continue
+        if isinstance(best_choose, list):
+            dates.extend([(findIndexesOfSearched(i, substring, x), x[1]) for x in best_choose])
         else:
-            dates.append((i, parsed_date))
+            dates.append((i, best_choose))
     return [(k, str(v)) for k, v in dates]
 
 
-j = '/home/przemek/Desktop/pracai/dane/nazwyPlikówIOczekiwane.json'
-with open(j) as f:
-    nazwyPlikowIOczekiwane = f.read()
-
-import json
-
-nazwa_pliku = 'youtube_1'
-nazwa_pliku_z_format = nazwa_pliku + '.txt'
-fname = '/home/przemek/Desktop/pracai/dane/' + nazwa_pliku_z_format
-
-js = json.loads(nazwyPlikowIOczekiwane)
-
-e = next(filter(lambda x: x['name'] == nazwa_pliku_z_format, js['files']), None)
-
-print(e['expected'])
-
-
-def sprawdz(excpected, results, content):
-    same_daty = sorted(results, key=lambda x: x[1])
-    v = ''
-    excpected.sort()
-    for e in excpected:
-        cr = ''
-        for r in same_daty:
-            if r[1] == e:
-                cr = r[1] + ' ' + str(r[0])
-                same_daty.remove(r)
-        v += e
-        v += '   '
-        v += cr
-        v += '\n'
-    if same_daty: v += '----NIEZNALEZIONE------\n'
-    for r in same_daty:
-        beg = r[0][0]
-        end = r[0][1]
-        v += content[beg:end+1] + '     '
-        v += r[1] + ' ' + str(r[0])
-        v += '\n'
-    return v
-
-import time
-
-
-
-with open(fname) as f:
-    content = f.read()
-    start = time.time()
-    d = find_dates(content)
-    end = time.time()
-    print("Zakończyłem szukanie dat")
-    oczekiwane = e['expected']
-    r = sprawdz(oczekiwane, d, content)
-    print(r)
-    print("Czas wykonywania")
-    print(str(end - start).replace('.',','))
-    print("Ilosc znakow")
-    print(len(content))
-    print("Ile bylo data")
-    print(len(oczekiwane))
-    print("Ile zwrocil")
-    print(len(d))
+# j = '/home/przemek/Desktop/pracai/dane/nazwyPlikówIOczekiwane.json'
+# with open(j) as f:
+#     nazwyPlikowIOczekiwane = f.read()
+#
+# import json
+#
+# nazwa_pliku = 'youtube_1'
+# nazwa_pliku_z_format = nazwa_pliku + '.txt'
+# fname = '/home/przemek/Desktop/pracai/dane/' + nazwa_pliku_z_format
+#
+# js = json.loads(nazwyPlikowIOczekiwane)
+#
+# e = next(filter(lambda x: x['name'] == nazwa_pliku_z_format, js['files']), None)
+#
+# print(e['expected'])
+#
+#
+# def sprawdz(excpected, results, content):
+#     same_daty = sorted(results, key=lambda x: x[1])
+#     v = ''
+#     excpected.sort()
+#     for e in excpected:
+#         cr = ''
+#         for r in same_daty:
+#             if r[1] == e:
+#                 cr = r[1] + ' ' + str(r[0])
+#                 same_daty.remove(r)
+#         v += e
+#         v += '   '
+#         v += cr
+#         v += '\n'
+#     if same_daty: v += '----NIEZNALEZIONE------\n'
+#     for r in same_daty:
+#         beg = r[0][0]
+#         end = r[0][1]
+#         v += content[beg:end+1] + '     '
+#         v += r[1] + ' ' + str(r[0])
+#         v += '\n'
+#     return v
+#
+# import time
+#
+#
+#
+# with open(fname) as f:
+#     content = f.read()
+#     start = time.time()
+#     d = find_dates(content)
+#     end = time.time()
+#     print("Zakończyłem szukanie dat")
+#     oczekiwane = e['expected']
+#     r = sprawdz(oczekiwane, d, content)
+#     print(r)
+#     print("Czas wykonywania")
+#     print(str(end - start).replace('.',','))
+#     print("Ilosc znakow")
+#     print(len(content))
+#     print("Ile bylo data")
+#     print(len(oczekiwane))
+#     print("Ile zwrocil")
+#     print(len(d))
 
 #
+
+# fname = '/home/przemek/Pobrane/numery_faktur.csv'
+# with open(fname) as f:
+#     content = f.readlines()
+# # you may also want to remove whitespace characters like `\n` at the end of each line
+# content = [x.strip() for x in content]
+#
+# from random import randint
+#
+# used_ids = []
+#
+# random_conten = ''
+#
+# for i in range(300):
+#     while True:
+#         rand = randint(0, len(content) - 1)
+#         if rand not in used_ids:
+#             used_ids.append(rand)
+#             random_conten += content[rand]
+#             random_conten += '\n'
+#             break
+
+import time
+fname = '/home/przemek/Pobrane/test.csv'
+with open(fname) as f:
+    content = f.read().strip()
+    # you may also want to remove whitespace characters like `\n` at the end of each line
+    content = content.strip()
+
+results = ""
+startt = time.time()
+res = find_dates(content)
+endt = time.time()
+for r in res:
+    beg = r[0][0]
+    end = r[0][1]
+    results += content[beg:end + 1]
+    results += ';'
+    results += r[1]
+    results += ';'
+    results += str(r[0])
+    results += '\n'
+
+print(results)
+text_file = open("/home/przemek/Pobrane/rezultat_nr_faktur_v2.csv", "w")
+text_file.write(results)
+text_file.close()
+print("Czas wykonywania")
+czas = endt - startt
+print(czas)
+print(str(czas).replace('.', ','))
+print("Ilosc znakow")
+print(len(content))
 
