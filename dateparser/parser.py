@@ -578,7 +578,7 @@ _DAYS_IN_MONTH = [None, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 
 def _is_leap(year):
     "year -> 1 if leap year, else 0."
-    return year is not None and year % 4 == 0 and (year % 100 != 0 or year % 400 == 0)
+    return year is not None and not isinstance(year,str) and year % 4 == 0 and (year % 100 != 0 or year % 400 == 0)
 
 
 def _days_in_month(year, month):
