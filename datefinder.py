@@ -263,7 +263,7 @@ class DateFinder(object):
             ## sanitize date string
             ## replace unhelpful whitespace characters with single whitespace
 
-            strings_and_indexes = self.get_splitted_strings_with_indexes('[\n\t]+', match_str, indices)
+            strings_and_indexes = self.get_splitted_strings_with_indexes('[\n\t,]+', match_str, indices)
             if (len(strings_and_indexes) > 0):
                 strings_and_indexes = [(re.sub('[\n\t\s\xa0]+', ' ', s[0]), s[1]) for s in strings_and_indexes]
                 strings_and_indexes = [(s[0].strip(self.STRIP_CHARS), s[1]) for s in strings_and_indexes]
