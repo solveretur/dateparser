@@ -10,7 +10,7 @@ class DateFinder(object):
     """
     Locates dates in a text
     """
-    MONTHS_PATTERN = r"stycze[n,ń]|stycz[n,ń]i?[a,u]|sty|january|jan|lutym?|lutego|lut|february|feb|marzec|marcu|marca|mar|march|kwiecie[n,ń]|kwietni[a,u]|kwi|april|maj|maja|maju|mai|czerwiec|czerwca|czerwcu|cze|june|jun|lipiec|lipca|lipcu|lip|lipcem|july|jul|sierp[n,ń]i[a,u]|sierpie[n,ń]|sie|august|aug|wrzesie[ń,n]|wrzesie[ń,n]i[a,u]|wrz|september|sep|pa[ź,z]dziernik|pa[z,ź]dziernik[a,u]|pa[z,ź]|october|oct|listopad|listopada|listopadzie|lis|november|nov|grudnia|grudniu|grudzie,n]|gru|december|dec"
+    MONTHS_PATTERN = r"stycz[n,ń]i?[a,u]|stycze[n,ń]|lutego|lutym?|marzec|marca|marcu|kwietni[a,u]|kwiecie[n,ń]|maja|maju|czerwiec|czerwca|czerwcu|jun|lipca|lipcu|lipiec|lipcem|jul|sierp[n,ń]i[a,u]|sierpie[n,ń]|aug|wrzesie[ń,n]|wrze[s,ś][ń,n]i[a,u]|pa[z,ź]dziernik[a,u]|pa[ź,z]dziernik|listopada|listopadzie|listopad|grudnia|grudniu|grudzie[ń,n]|january|february|march|april|mai|june|july|august|september|october|november|december|sty|lut|mar|kwi|maj|cze|lip|sie|wrz|pa[ź,z]|lis|gru|jan|feb|mar|apr|mai|jun|jul|aug|sep|oct|nov|dec"
 
     DIGITS_MODIFIER_PATTERN = '\d+st|\d+th|\d+rd|first|second|third|fourth|fifth|sixth|seventh|eighth|nineth|tenth|next|last'
     DIGITS_PATTERN = '\d+'
