@@ -206,11 +206,24 @@ def findIndexesOfSearched(originalIndex, originalSubstring, searchResult):
     return originalIndex[0] + i, originalIndex[0] + i + len(searchResult[0])
 
 
+def contains_only_fullforms(string):
+    from datefinder import DateFinder
+    df = DateFinder
+    pattern = re.compile(r"(" + df.FULL_MONTHS_POLISH + "|" + df.FULL_MONTHS_ENGLISH + ")", re.IGNORECASE)
+    return bool(re.search(pattern, string))
+
+
+def only_month(date):
+    pattern = re.compile(r"Undefined-\d{2}-Undefined")
+    return re.match(pattern, date)
+
+
 def matches_ymd(string):
     from datefinder import DateFinder
     df = DateFinder
     pattern = re.compile(
-        r"((\d{4})(" + df.DELIMITERS_PATTERN + ")(0?[0-9]|1[0-2])(" + df.DELIMITERS_PATTERN + ")(0?[0-9]|1[0-2]))")
+        r"((\d{4})(" + df.DELIMITERS_PATTERN + ")(0?[0-9]|1[0-2])(" + df.DELIMITERS_PATTERN + ")(0?[0-9]|1[0-2]))",
+        re.IGNORECASE)
     return bool(re.search(pattern, string))
 
 
@@ -237,6 +250,10 @@ def find_dates(text):
         if isinstance(best_choose, list):
             dates.extend([(findIndexesOfSearched(i, substring, x), x[1]) for x in best_choose])
         else:
+            month = only_month(str(best_choose))
+            substring_ = not contains_only_fullforms(substring)
+            if month and substring_:
+                continue
             dates.append((i, best_choose))
     return [(k, str(v)) for k, v in dates]
 
@@ -249,7 +266,7 @@ with open(j) as f:
 
 import json
 
-nazwa_pliku = 'youtube_1'
+nazwa_pliku = 'youtube'
 nazwa_pliku_z_format = nazwa_pliku + '.txt'
 fname = '/home/przemek/Desktop/pracai/dane/' + nazwa_pliku_z_format
 
@@ -278,12 +295,14 @@ def sprawdz(excpected, results, content):
     for r in same_daty:
         beg = r[0][0]
         end = r[0][1]
-        v += content[beg:end+1] + '     '
+        v += content[beg:end + 1] + '     '
         v += r[1] + ' ' + str(r[0])
         v += '\n'
     return v
 
+
 import time
+
 with open(fname) as f:
     content = f.read()
     start = time.time()
@@ -294,22 +313,13 @@ with open(fname) as f:
     r = sprawdz(oczekiwane, d, content)
     print(r)
     print("Czas wykonywania")
-    print(str(end - start).replace('.',','))
+    print(str(end - start).replace('.', ','))
     print("Ilosc znakow")
     print(len(content))
     print("Ile bylo data")
     print(len(oczekiwane))
     print("Ile zwrocil")
     print(len(d))
-
-
-
-
-
-
-
-
-
 
 # ================ NR FAKTUR TEST ===========================
 # fname = '/home/przemek/Pobrane/numery_faktur.csv'
