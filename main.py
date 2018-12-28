@@ -231,6 +231,10 @@ def replace_days_and_months(date):
     splitted = date.split('-')
     return splitted[0] + '-' + splitted[2] + '-' + splitted[1]
 
+def isprice_pattern(date):
+    PRICE_PATTERN=r"^(-?\d{1,2}\.)(4[0-9]|5[0-9]|6[0-9]|7[0-9]|8[0-9]|9[0-9]|00)$"
+    return re.match(PRICE_PATTERN, date)
+
 
 def find_dates(text):
     substrings = find_dates_substring(text)
@@ -252,6 +256,8 @@ def find_dates(text):
         else:
             if only_month(str(best_choose)) and not contains_only_fullforms(substring):
                 continue
+            if isprice_pattern(substring):
+                continue
             dates.append((i, best_choose))
     return [(k, str(v)) for k, v in dates]
 
@@ -264,7 +270,7 @@ with open(j) as f:
 
 import json
 
-nazwa_pliku = 'transakcje'
+nazwa_pliku = 'youtube_1'
 nazwa_pliku_z_format = nazwa_pliku + '.txt'
 fname = '/home/przemek/Desktop/pracai/dane/' + nazwa_pliku_z_format
 
@@ -297,8 +303,8 @@ def sprawdz(excpected, results, content):
         v += r[1] + ' ' + str(r[0])
         v += '\n'
     return v
-
-
+#
+#
 import time
 
 with open(fname) as f:
