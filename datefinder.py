@@ -11,7 +11,7 @@ class DateFinder(object):
     Locates dates in a text
     """
 
-    FULL_MONTHS_POLISH = r"stycz[n,ń]i?[a,u]|stycze[n,ń]|lutego|lutym?|marzec|marca|marcu|kwietni[a,u]|kwiecie[n,ń]|maja|maju|czerwiec|czerwca|czerwcu|jun|lipca|lipcu|lipiec|lipcem|jul|sierp[n,ń]i[a,u]|sierpie[n,ń]|aug|wrzesie[ń,n]|wrze[s,ś][ń,n]i[a,u]|pa[z,ź]dziernik[a,u]|pa[ź,z]dziernik|listopada|listopadzie|listopad|grudnia|grudniu|grudzie[ń,n]"
+    FULL_MONTHS_POLISH = r"stycz[n,ń]i?[a,u]|stycze[n,ń]|lutego|lutym?|marzec|marca|marcu|kwietni[a,u]|kwiecie[n,ń]|maja|maju|czerwiec|czerwca|czerwcu|lipca|lipcu|lipiec|lipcem|sierp[n,ń]i[a,u]|sierpie[n,ń]|wrzesie[ń,n]|wrze[s,ś][ń,n]i[a,u]|pa[z,ź]dziernik[a,u]|pa[ź,z]dziernik|listopada|listopadzie|listopad|grudnia|grudniu|grudzie[ń,n]"
     SHORT_MONTHS_POLISH = r"sty|lut|mar|kwi|maj|cze|lip|sie|wrz|pa[ź,z]|lis|gru"
     FULL_MONTHS_ENGLISH = r"january|february|march|april|mai|june|july|august|september|october|november|december"
     SHORT_MONTHS_ENGLISH = r"jan|feb|mar|apr|mai|jun|jul|aug|sep|oct|nov|dec"
