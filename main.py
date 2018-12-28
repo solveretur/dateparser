@@ -250,9 +250,7 @@ def find_dates(text):
         if isinstance(best_choose, list):
             dates.extend([(findIndexesOfSearched(i, substring, x), x[1]) for x in best_choose])
         else:
-            month = only_month(str(best_choose))
-            substring_ = not contains_only_fullforms(substring)
-            if month and substring_:
+            if only_month(str(best_choose)) and not contains_only_fullforms(substring):
                 continue
             dates.append((i, best_choose))
     return [(k, str(v)) for k, v in dates]
@@ -266,7 +264,7 @@ with open(j) as f:
 
 import json
 
-nazwa_pliku = 'youtube'
+nazwa_pliku = 'transakcje'
 nazwa_pliku_z_format = nazwa_pliku + '.txt'
 fname = '/home/przemek/Desktop/pracai/dane/' + nazwa_pliku_z_format
 
