@@ -162,9 +162,12 @@ def find_dates_substring(text):
 
 
 import regex as re
+
+
 def remove_only_one_digit_substrings(substring):
-    pattern=re.compile('^[/\:\-\,\s\_\+\@\.]{0,}[\d{1}][/\:\-\,\s\_\+\@\.]{0,}$')
-    return re.match(pattern,substring) is not None
+    pattern = re.compile('^[/\:\-\,\s\_\+\@\.]{0,}[\d{1}][/\:\-\,\s\_\+\@\.]{0,}$')
+    return re.match(pattern, substring) is not None
+
 
 def choose_best_parsed(parsed_pl, parsed_en, search_result):
     if parsed_pl is None and parsed_en is None and search_result is None:
@@ -203,16 +206,31 @@ def findIndexesOfSearched(originalIndex, originalSubstring, searchResult):
     return originalIndex[0] + i, originalIndex[0] + i + len(searchResult[0])
 
 
+def matches_ymd(string):
+    from datefinder import DateFinder
+    df = DateFinder
+    pattern = re.compile(
+        r"((\d{4})(" + df.DELIMITERS_PATTERN + ")(0?[0-9]|1[0-2])(" + df.DELIMITERS_PATTERN + ")(0?[0-9]|1[0-2]))")
+    return bool(re.search(pattern, string))
+
+
+def replace_days_and_months(date):
+    splitted = date.split('-')
+    return splitted[0] + '-' + splitted[2] + '-' + splitted[1]
+
+
 def find_dates(text):
     substrings = find_dates_substring(text)
     dates = []
     for s, i in substrings:
         substring = s
-        if(remove_only_one_digit_substrings(substring)):
+        if (remove_only_one_digit_substrings(substring)):
             continue
         parsed_date_pl = dateparser.parse(substring, languages=["pl"])
         parsed_date_en = dateparser.parse(substring, languages=["en"])
         search_results = search.search_dates(substring, languages=["pl"])
+        if parsed_date_en is not None and parsed_date_pl is not None and matches_ymd(str(substring)) and replace_days_and_months(str(parsed_date_pl)) == str(parsed_date_en):
+            parsed_date_pl = parsed_date_en
         best_choose = choose_best_parsed(parsed_date_pl, parsed_date_en, search_results)
         if best_choose is None:
             continue
@@ -221,6 +239,8 @@ def find_dates(text):
         else:
             dates.append((i, best_choose))
     return [(k, str(v)) for k, v in dates]
+
+
 #
 #
 j = '/home/przemek/Desktop/pracai/dane/nazwyPlikówIOczekiwane.json'
@@ -229,7 +249,7 @@ with open(j) as f:
 
 import json
 
-nazwa_pliku = 'transakcje'
+nazwa_pliku = 'youtube_1'
 nazwa_pliku_z_format = nazwa_pliku + '.txt'
 fname = '/home/przemek/Desktop/pracai/dane/' + nazwa_pliku_z_format
 
@@ -282,8 +302,16 @@ with open(fname) as f:
     print("Ile zwrocil")
     print(len(d))
 
-#
 
+
+
+
+
+
+
+
+
+# ================ NR FAKTUR TEST ===========================
 # fname = '/home/przemek/Pobrane/numery_faktur.csv'
 # with open(fname) as f:
 #     content = f.readlines()
@@ -294,46 +322,27 @@ with open(fname) as f:
 #
 # used_ids = []
 #
-# random_conten = ''
+# random_conten = []
+#
 #
 # for i in range(300):
 #     while True:
 #         rand = randint(0, len(content) - 1)
 #         if rand not in used_ids:
 #             used_ids.append(rand)
-#             random_conten += content[rand]
-#             random_conten += '\n'
+#             random_conten.append(content[rand])
 #             break
-
-# import time
-# fname = '/home/przemek/Pobrane/numery_faktur.csv'
-# with open(fname) as f:
-#     content = f.read().strip()
-#     # you may also want to remove whitespace characters like `\n` at the end of each line
-#     content = content.strip()
 #
 # results = ""
-# startt = time.time()
-# res = find_dates(content)
-# endt = time.time()
-# for r in res:
-#     beg = r[0][0]
-#     end = r[0][1]
-#     results += content[beg:end + 1]
-#     results += ';'
-#     results += r[1]
-#     results += ';'
-#     results += str(r[0])
-#     results += '\n'
+# for l in random_conten:
+#     d = find_dates(l)
+#     results += l
+#     if d is not None:
+#         for i in range(len(d)):
+#             results += ';'
+#             results += str(d[i][1])
+#     results+='\n'
 #
-# print(results)
-# text_file = open("/home/przemek/Pobrane/rezultat_nr_faktur_calosc.csv", "w")
+# text_file = open("/home/przemek/Pobrane/result_not_line_by_line.csv", "w")
 # text_file.write(results)
 # text_file.close()
-# print("Czas wykonywania")
-# czas = endt - startt
-# print(czas)
-# print(str(czas).replace('.', ','))
-# print("Ilosc znakow")
-# print(len(content))
-
