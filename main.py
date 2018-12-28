@@ -229,7 +229,7 @@ def find_dates(text):
         parsed_date_pl = dateparser.parse(substring, languages=["pl"])
         parsed_date_en = dateparser.parse(substring, languages=["en"])
         search_results = search.search_dates(substring, languages=["pl"])
-        if parsed_date_en is not None and parsed_date_pl is not None and matches_ymd(str(substring)) and replace_days_and_months(str(parsed_date_pl)) == str(parsed_date_en):
+        if parsed_date_en is not None and parsed_date_pl is not None and replace_days_and_months(str(parsed_date_pl)) == str(parsed_date_en) and matches_ymd(str(substring)):
             parsed_date_pl = parsed_date_en
         best_choose = choose_best_parsed(parsed_date_pl, parsed_date_en, search_results)
         if best_choose is None:
