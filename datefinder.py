@@ -10,8 +10,12 @@ class DateFinder(object):
     """
     Locates dates in a text
     """
-    MONTHS_PATTERN = r"stycz[n,ń]i?[a,u]|stycze[n,ń]|lutego|lutym?|marzec|marca|marcu|kwietni[a,u]|kwiecie[n,ń]|maja|maju|czerwiec|czerwca|czerwcu|jun|lipca|lipcu|lipiec|lipcem|jul|sierp[n,ń]i[a,u]|sierpie[n,ń]|aug|wrzesie[ń,n]|wrze[s,ś][ń,n]i[a,u]|pa[z,ź]dziernik[a,u]|pa[ź,z]dziernik|listopada|listopadzie|listopad|grudnia|grudniu|grudzie[ń,n]|january|february|march|april|mai|june|july|august|september|october|november|december|sty|lut|mar|kwi|maj|cze|lip|sie|wrz|pa[ź,z]|lis|gru|jan|feb|mar|apr|mai|jun|jul|aug|sep|oct|nov|dec"
 
+    FULL_MONTHS_POLISH = r"stycz[n,ń]i?[a,u]|stycze[n,ń]|lutego|lutym?|marzec|marca|marcu|kwietni[a,u]|kwiecie[n,ń]|maja|maju|czerwiec|czerwca|czerwcu|jun|lipca|lipcu|lipiec|lipcem|jul|sierp[n,ń]i[a,u]|sierpie[n,ń]|aug|wrzesie[ń,n]|wrze[s,ś][ń,n]i[a,u]|pa[z,ź]dziernik[a,u]|pa[ź,z]dziernik|listopada|listopadzie|listopad|grudnia|grudniu|grudzie[ń,n]"
+    SHORT_MONTHS_POLISH = r"sty|lut|mar|kwi|maj|cze|lip|sie|wrz|pa[ź,z]|lis|gru"
+    FULL_MONTHS_ENGLISH = r"january|february|march|april|mai|june|july|august|september|october|november|december"
+    SHORT_MONTHS_ENGLISH = r"jan|feb|mar|apr|mai|jun|jul|aug|sep|oct|nov|dec"
+    MONTHS_PATTERN = FULL_MONTHS_POLISH + "|" + FULL_MONTHS_ENGLISH + "|" + SHORT_MONTHS_POLISH + "|" + SHORT_MONTHS_ENGLISH
     DIGITS_MODIFIER_PATTERN = '\d+st|\d+th|\d+rd|first|second|third|fourth|fifth|sixth|seventh|eighth|nineth|tenth|next|last'
     DIGITS_PATTERN = '\d+'
     DAYS_PATTERN = 'monday|tuesday|wednesday|thursday|friday|saturday|sunday|mon|tue|tues|wed|thur|thurs|fri|sat|sun'
