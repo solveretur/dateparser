@@ -236,6 +236,14 @@ def isprice_pattern(date):
     return re.match(PRICE_PATTERN, date)
 
 
+def is_not_valid(substring, best_choose):
+    if only_month(str(best_choose)) and not contains_only_fullforms(substring):
+        return True
+    if isprice_pattern(substring):
+        return True
+    return False
+
+
 def find_dates(text):
     substrings = find_dates_substring(text)
     dates = []
@@ -254,9 +262,7 @@ def find_dates(text):
         if isinstance(best_choose, list):
             dates.extend([(findIndexesOfSearched(i, substring, x), x[1]) for x in best_choose])
         else:
-            if only_month(str(best_choose)) and not contains_only_fullforms(substring):
-                continue
-            if isprice_pattern(substring):
+            if is_not_valid(substring, best_choose):
                 continue
             dates.append((i, best_choose))
     return [(k, str(v)) for k, v in dates]
@@ -303,6 +309,8 @@ def sprawdz(excpected, results, content):
         v += r[1] + ' ' + str(r[0])
         v += '\n'
     return v
+
+
 #
 #
 import time
