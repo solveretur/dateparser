@@ -236,10 +236,17 @@ def isprice_pattern(date):
     return re.match(PRICE_PATTERN, date)
 
 
+def is_only_numerical(substring):
+    ONLY_NUMERICAL_PATTERN=r"^(t\.\s)?\d{1,2}$"
+    return re.match(ONLY_NUMERICAL_PATTERN, substring)
+
+
 def is_not_valid(substring, best_choose):
     if only_month(str(best_choose)) and not contains_only_fullforms(substring):
         return True
     if isprice_pattern(substring):
+        return True
+    if is_only_numerical(substring):
         return True
     return False
 
@@ -276,7 +283,7 @@ with open(j) as f:
 
 import json
 
-nazwa_pliku = 'youtube_1'
+nazwa_pliku = 'etykieta_6'
 nazwa_pliku_z_format = nazwa_pliku + '.txt'
 fname = '/home/przemek/Desktop/pracai/dane/' + nazwa_pliku_z_format
 
@@ -368,3 +375,9 @@ with open(fname) as f:
 # text_file = open("/home/przemek/Pobrane/result_not_line_by_line.csv", "w")
 # text_file.write(results)
 # text_file.close()
+
+
+
+print(find_dates("3"))
+
+
