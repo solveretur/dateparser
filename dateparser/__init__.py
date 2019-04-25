@@ -138,8 +138,7 @@ def findIndexesOfSearched(originalIndex, originalSubstring, searchResult):
 
 
 def contains_only_fullforms(string):
-    from datefinder import DateFinder
-    df = DateFinder
+    df = datefinder.DateFinder
     pattern = re.compile(r"(" + df.FULL_MONTHS_POLISH + "|" + df.FULL_MONTHS_ENGLISH + ")", re.IGNORECASE)
     return bool(re.search(pattern, string))
 
@@ -150,8 +149,7 @@ def only_month(date):
 
 
 def matches_ymd(string):
-    from datefinder import DateFinder
-    df = DateFinder
+    df = datefinder.DateFinder
     pattern = re.compile(
         r"((\d{4})(" + df.DELIMITERS_PATTERN + ")(0?[0-9]|1[0-2])(" + df.DELIMITERS_PATTERN + ")(0?[0-9]|1[0-2]))",
         re.IGNORECASE)
